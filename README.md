@@ -6,6 +6,8 @@ Programmers SQL Quiz
 - [SQL 고득점 Kit](https://programmers.co.kr/learn/challenges)
 - 사이트에서 풀었던 문제의 해답만 기록합니다. ~~사이트도 먹고 살아야죠~~
 
+![alt text](result.png)
+
 # Select
 ## 1번 - 모든 레코드 조회하기
 ```sql
@@ -279,12 +281,29 @@ SELECT
 from animal_ins 
 ```
 
-## 4번 - 
+## 4번 - 오랜 기간 보호한 동물(2)
 ```sql
-
+select
+    animal_id,
+    name
+from (
+SELECT
+    animal_ins.animal_id as animal_id,
+    animal_ins.name as name,
+    datediff(animal_outs.datetime, animal_ins.datetime) as date_diff
+from animal_ins
+join animal_outs on animal_outs.animal_id = animal_ins.animal_id
+group by 1, 2
+    ) as new_table
+order by date_diff DESC
+limit 2
 ```
 
-## 5번 - 
+## 5번 - DATETIME에서 DATE로 형 변환 
 ```sql
-
+SELECT
+    animal_id,
+    name,
+    date_format(datetime, "%Y-%m-%d") as "날짜"
+from animal_ins
 ```
