@@ -4,7 +4,7 @@ Programmers SQL Quiz
 # Introduction
 프로그래머스 사이트에서 제공하는 SQL 고득점 Kit 문제 풀이 기록입니다.
 - [SQL 고득점 Kit](https://programmers.co.kr/learn/challenges)
-- 사이트에서 풀었던 문제의 해답만 기록합니다. ~~사이트도 먹고 살아야죠~~
+- Update : 2023-02-05, 신규 추가 문제 풀이 중
 
 ![alt text](result.png)
 
@@ -67,6 +67,82 @@ from animal_ins
 order by datetime ASC
 limit 1
 ```
+
+## 추가 문제 - 평균 일일 대여 요금 구하기
+```sql
+SELECT round(AVG(DAILY_FEE), 0) as AVERAGE_FEE
+from CAR_RENTAL_COMPANY_CAR
+where 1=1
+  and CAR_TYPE = "SUV"
+```
+
+
+## 재구매가 일어난 상품과 회원 리스트 구하기
+```sql
+SELECT USER_ID, PRODUCT_ID
+from ONLINE_SALE
+group by 1, 2
+having count(user_ID) >= 2
+order by 1, 2 desc
+```
+
+## 3월에 태어난 여성 회원 목록 출력하기
+```sql
+SELECT MEMBER_ID, MEMBER_NAME
+     , GENDER, DATE_FORMAT(DATE_OF_BIRTH, '%Y-%m-%d') as DATE_OF_BIRTH
+from MEMBER_PROFILE
+where 1=1
+  and TLNO is not null
+  and EXTRACT(MONTH from DATE_OF_BIRTH) = 3
+  and GENDER = "W"
+order by member_id
+```
+
+## 인기있는 아이스크림
+```sql
+SELECT FLAVOR
+from FIRST_HALF
+group by 1
+order by sum(TOTAL_ORDER) desc, SHIPMENT_ID
+```
+
+## 조건에 맞는 도서 리스트 출력하기
+```sql
+SELECT BOOK_ID, DATE_FORMAT(PUBLISHED_DATE, '%Y-%m-%d') as PUBLISHED_DATE
+from book
+where 1=1
+  and CATEGORY = "인문"
+  and PUBLISHED_DATE like "2021-%"
+order by PUBLISHED_DATE
+```
+
+## 과일로 만든 아이스크림 고르기
+```sql
+# SELECT FIRST_HALF.flavor
+# from FIRST_HALF
+# inner join (
+#     select *
+#     from ICECREAM_INFO
+#     where INGREDIENT_TYPE = "fruit_based"
+#     ) ice_if on ice_if.flavor = FIRST_HALF.flavor
+# group by 1
+# having sum(FIRST_HALF.TOTAL_ORDER) > 3000
+# order by sum(FIRST_HALF.TOTAL_ORDER) desc
+
+SELECT FIRST_HALF.flavor
+from FIRST_HALF
+inner join ICECREAM_INFO on ICECREAM_INFO.flavor = FIRST_HALF.flavor
+where INGREDIENT_TYPE = "fruit_based"
+group by 1
+having sum(FIRST_HALF.TOTAL_ORDER) > 3000
+order by sum(FIRST_HALF.TOTAL_ORDER) desc
+```
+
+## 
+```sql
+
+```
+
 
 # SUM, MAX, MIN
 ## 1번 - 최댓값 구하기
@@ -201,6 +277,14 @@ SELECT
     IFNULL(NAME, "No name") as NAME,
     SEX_UPON_INTAKE
 from ANIMAL_INS
+```
+
+## 경기도에 위치한 식품창고 목록 출력하기
+```sql
+SELECT WAREHOUSE_ID, WAREHOUSE_NAME, ADDRESS, IFNULL(FREEZER_YN, "N") as FREEZER_YN
+from FOOD_WAREHOUSE
+where 1=1
+  and WAREHOUSE_NAME like "%_경기%"
 ```
 
 # JOIN
