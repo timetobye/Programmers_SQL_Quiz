@@ -6,7 +6,6 @@ Advent of SQL 2024에서 제공하는 SQL 문제 풀이 기록
 - [Advent of SQL 2024](https://solvesql.com/collections/advent-of-sql-2024/)
 - 모든 쿼리는 SQLite 기준으로 작성 되었습니다.
 
-# Select
 ## 1번 - 크리스마스 게임 찾기
 
 풀이 방법 : 패턴 매칭 이용
@@ -149,4 +148,139 @@ select game_id, name
 from omitted_base as ob
 left join expert_all as ea on ea.genre_id = ob.genre_id
 left join user_all as ua on ua.genre_id = ob.genre_id
+```
+
+## 10번 - 최대값을 가진 행 찾기
+
+풀이 방법 : 이 방법이 제일 깔끔한 방법인가? where 에 쓰는게 썩 좋아보이지는 않은데
+
+```sql
+select id
+from points
+where x in (select max(x) from points) or y in (select max(y) from points)
+order by 1
+```
+
+## 11번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 12번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 13번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 14번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 15번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 16번 - 
+
+풀이 방법 : 푸는 중
+
+```sql
+with origin as (
+  select author, year, 1 + sum(flag) over (partition by author, cumulative_group order by year) as result
+  from (
+    select author, year, flag
+        , sum(case when flag = 0 then 1 else 0 end) over (partition by author order by year) as cumulative_group
+    from (
+      select author
+          , year
+          , case when year = (1 + lag(year, 1) over (partition by author order by year)) then 1 else 0 end as flag
+      from (select author, year from books group by 1, 2)
+    ) as base
+  ) as calc
+) 
+```
+
+## 17번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 18번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 19번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 20번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 21번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 22번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 23번 - 
+
+풀이 방법 : 
+
+```sql
+
+```
+
+## 24번 - 
+
+풀이 방법 : 
+
+```sql
+
 ```
