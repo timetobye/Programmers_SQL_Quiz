@@ -221,12 +221,32 @@ with origin as (
 ) 
 ```
 
-## 17번 - 
+## 17번 - 멀티 플랫폼 게임 찾기
 
-풀이 방법 : 
+풀이 방법 : 조건에 맞게 그룹화 하여 붙이면 된다.
+- 문제는 문제 설명과 테이블의 데이터가 어긋나 있는 부분이 있는데 기준을 어디에 두느냐에 따라 완전히 다른 결과를 얻게 될 수도 있다.
+- 다소 아쉬운 문제
 
 ```sql
-
+select name
+from (
+  select name, count(distinct mj_pl_name) as cnt_mj_pl_name
+  from games as gm
+  inner join (
+    select platform_id as pl_id, name as pl_name
+         , case when name in ('PS3', 'PS4', 'PSP', 'PSV') then 'Sony'
+                when name in ('Wii', 'WiiU', 'DS', '3DS') then 'Nintendo'
+                else 'Microsoft'
+            end as mj_pl_name
+    from platforms
+    where 1=1
+      and name in ('PS3', 'PS4', 'PSP', 'PSV', 'Wii', 'WiiU', 'DS', '3DS', 'X360', 'XONE')
+  ) as pl on pl.pl_id = gm.platform_id
+  where 1=1
+    and year >= 2012
+  group by 1
+  HAVING count(distinct mj_pl_name) >= 2
+) as base
 ```
 
 ## 18번 - 
