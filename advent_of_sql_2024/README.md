@@ -249,12 +249,33 @@ from (
 ) as base
 ```
 
-## 18번 - 
+## 18번 - 펭귄 날개와 몸무게의 상관 계수
 
-풀이 방법 : 
+풀이 방법 : 그냥 상관 계수를 쿼리로 구현하면 된다.
 
 ```sql
-
+with calc as (
+      select species
+          , x_avg_x * y_avg_y as value_1
+          , x_avg_x * x_avg_x as value_2
+          , y_avg_y * y_avg_y as value_3
+      from (
+        select species
+            , flipper_length_mm
+            , avg(flipper_length_mm) over (partition by species) as avg_flnm
+            , flipper_length_mm - avg(flipper_length_mm) over (partition by species) as x_avg_x
+            , body_mass_g
+            , avg(body_mass_g) over (partition by species) as avg_bmg
+            , body_mass_g - avg(body_mass_g) over (partition by species) as y_avg_y
+        from penguins
+        where 1=1
+          and flipper_length_mm is not null or body_mass_g is not null
+      ) as base
+)
+select species
+     , round(sum(value_1) / sqrt(sum(value_2)* sum(value_3)), 3) as corr
+from calc
+group by 1
 ```
 
 ## 19번 - 
