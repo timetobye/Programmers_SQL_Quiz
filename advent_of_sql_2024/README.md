@@ -201,24 +201,34 @@ order by 1
 
 ```
 
-## 16번 - 
+## 16번 - 스테디셀러 작가 찾기
 
-풀이 방법 : 푸는 중
+풀이 방법
+- 소설 작가
+- encounter 방식으로 그룹을 만들어서 처리함
 
 ```sql
 with origin as (
-  select author, year, 1 + sum(flag) over (partition by author, cumulative_group order by year) as result
+  select author, year, flag, cumulative_group, 1 + sum(flag) over (partition by author, cumulative_group order by year) as result
   from (
     select author, year, flag
         , sum(case when flag = 0 then 1 else 0 end) over (partition by author order by year) as cumulative_group
     from (
-      select author
-          , year
-          , case when year = (1 + lag(year, 1) over (partition by author order by year)) then 1 else 0 end as flag
-      from (select author, year from books group by 1, 2)
+      select author, year
+           , case when year = (1 + lag(year, 1) over (partition by author order by year)) then 1 else 0 end as flag
+      from (select author, year from books where genre='Fiction' group by 1, 2)
     ) as base
   ) as calc
 ) 
+
+select author, max(year) as year, max(result) as depth
+from (
+  select * 
+  from origin 
+  where result >= 5
+) 
+group by 1
+order by 1
 ```
 
 ## 17번 - 멀티 플랫폼 게임 찾기
