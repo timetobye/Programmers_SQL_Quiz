@@ -169,20 +169,46 @@ order by 1
 
 ```
 
-## 12번 - 
+## 12번 - 3년간 들어온 소장품 집계하기
 
-풀이 방법 : 
+풀이 방법 : year 추출하는 방법만 알면 해결 가능
 
 ```sql
-
+select classification
+    , sum(case when strftime('%Y', acquisition_date) = '2014' then 1 else 0 end) as '2014'
+    , sum(case when strftime('%Y', acquisition_date) = '2015' then 1 else 0 end) as '2015'
+    , sum(case when strftime('%Y', acquisition_date) = '2016' then 1 else 0 end) as '2016'
+from artworks
+where 1=1
+group by 1
+order by 1
 ```
 
-## 13번 - 
+## 13번 - 게임 개발사의 주력 플랫폼 찾기
 
-풀이 방법 : 
+풀이 방법 : 조인 잘 하고 dense_rank 이용해서 처리 하면 됨
 
 ```sql
-
+select cp_name as developer, pl_name as platform, sum_sales_total as sales
+from (
+  select cp_name, pl_name, sum_sales_total, dense_rank() over(partition by cp_name order by sum_sales_total desc) as rank
+  from (
+    select cp_name, pl_name, sum(sales_total) as sum_sales_total
+    from (
+      select developer_id as dev_id, cp.name as cp_name
+           , pl.name as pl_name, gm.platform_id as gm_pl_id
+           , (sales_eu + sales_jp + sales_na + sales_other) as sales_total
+      from games as gm
+      left join companies as cp on cp.company_id = gm.developer_id
+      left join platforms as pl on pl.platform_id = gm.platform_id
+      where 1=1
+        and developer_id is not NULL
+    ) as base
+    group by 1, 2
+  ) as calc
+) as res
+where 1=1
+  and rank = 1
 ```
 
 ## 14번 - 
