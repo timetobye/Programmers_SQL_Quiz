@@ -161,12 +161,36 @@ where x in (select max(x) from points) or y in (select max(y) from points)
 order by 1
 ```
 
-## 11번 - 
+## 11번 - 서울숲 요일별 대기오염도 계산하기
 
-풀이 방법 : 
+풀이 방법 : 함수하고 조건에 맞추면 크게 문제 없는데 정렬 순서는 어거지로 한 것 같다.
 
 ```sql
-
+select 
+     case when strftime('%w', measured_at) = '1' then '월요일'
+          when strftime('%w', measured_at) = '2' then '화요일'
+          when strftime('%w', measured_at) = '3' then '수요일'
+          when strftime('%w', measured_at) = '4' then '목요일'
+          when strftime('%w', measured_at) = '5' then '금요일'
+          when strftime('%w', measured_at) = '6' then '토요일'
+          when strftime('%w', measured_at) = '0' then '일요일'
+      end as weekday
+     , round(avg(no2), 4) as no2
+     , round(avg(o3), 4) as o3
+     , round(avg(co), 4) as co
+     , round(avg(so2), 4) as so2
+     , round(avg(pm10), 4) as pm10
+     , round(avg(pm2_5), 4) as pm2_5
+from measurements
+group by 1
+order by case when strftime('%w', measured_at) = '1' then 1
+          when strftime('%w', measured_at) = '2' then 2
+          when strftime('%w', measured_at) = '3' then 3
+          when strftime('%w', measured_at) = '4' then 4
+          when strftime('%w', measured_at) = '5' then 5
+          when strftime('%w', measured_at) = '6' then 6
+          when strftime('%w', measured_at) = '0' then 7
+      end
 ```
 
 ## 12번 - 3년간 들어온 소장품 집계하기
