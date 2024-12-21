@@ -394,28 +394,58 @@ from calc
 group by 1
 ```
 
-## 19번 - 
+## 19번 - 전국 카페 주소 데이터 정제하기
 
-풀이 방법 : 
+풀이 방법 : sqlite 니까 이렇게 푼 것 같다. 다른 서비스였으면 그냥 split(' ')으로 해결 했을듯
 
 ```sql
-
+select
+  SUBSTR(address, 1, INSTR(address, ' ') - 1) as sido,
+  SUBSTR(address, INSTR(address, ' ') + 1, INSTR(SUBSTR(address, INSTR(address, ' ') + 1), ' ') - 1) as sigungu,
+  count(*) as cnt
+from cafes
+group by 1, 2
+order by 3 desc
 ```
 
-## 20번 - 
+## 20번 - 미세먼지 수치의 계절간 차이
 
-풀이 방법 : 
+풀이 방법 : case when 으로 처리 가능
 
 ```sql
-
+select
+  case when measured_at >= '2022-03-01' and measured_at < '2022-06-01' then 'spring'
+       when measured_at >= '2022-06-01' and measured_at < '2022-09-01' then 'summer'
+       when measured_at >= '2022-09-01' and measured_at < '2022-12-01' then 'autumn'
+       else 'winter'
+   end as 'season',
+   median(pm10) as pm10_median,
+   round(avg(pm10), 2) as pm10_average
+from measurements
+group by 1
 ```
 
-## 21번 - 
+## 21번 - 세션 유지 시간을 10분으로 재정의하기
 
-풀이 방법 : 
+풀이 방법 : lag 써서 풀이 하면 된다. 시간 제약이 10분 이니까 10분 미만으로 처리
 
 ```sql
-
+select user_pseudo_id, event_timestamp_kst, event_name, ga_session_id
+     , sum(flag) over(order by event_timestamp_kst) as new_session_id
+from (
+  select user_pseudo_id
+      , event_timestamp_kst, lag_et_kst, event_name, ga_session_id
+      , strftime('%s', event_timestamp_kst) - strftime('%s', lag_et_kst) as second_interval
+      , case when strftime('%s', event_timestamp_kst) - strftime('%s', lag_et_kst) < 600 then 0 else 1 end as flag
+  from (
+    select user_pseudo_id
+        , event_timestamp_kst, event_name, ga_session_id
+        , IFNULL(lag(event_timestamp_kst) over (order by event_timestamp_kst asc), 0) as lag_et_kst
+    from ga
+    where 1=1
+      and user_pseudo_id = 'a8Xu9GO6TB'
+  ) as base
+) as calc
 ```
 
 ## 22번 - 
@@ -437,6 +467,15 @@ group by 1
 ## 24번 - 
 
 풀이 방법 : 
+
+```sql
+
+```
+
+## 25번 - 
+
+풀이 방법 : 
+- 다 풀고 나니 크리스마스에 이걸 푼 내가 레전드
 
 ```sql
 
