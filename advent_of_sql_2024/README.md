@@ -235,20 +235,76 @@ where 1=1
   and rank = 1
 ```
 
-## 14번 - 
+## 14번 - 전력 소비량 이동 평균 구하기
 
-풀이 방법 : 
+풀이 방법 : 이동 평균 구하는 것은 어렵지 않은데 오래간만에 rows between ~ and ~ 구문을 사용해서 헷갈렸다.
+- 좀 더 깔끔하게 풀 수 있을 것 같은데 그냥 넘어감
 
 ```sql
-
+select *
+from (
+  select measured_at as end_at
+      , round(avg(zone_quads) over (rows BETWEEN 6 PRECEDING and 1 PRECEDING), 2) as zone_quads
+      , round(avg(zone_smir) over (rows BETWEEN 6 PRECEDING and 1 PRECEDING), 2) as zone_smir
+      , round(avg(zone_boussafou) over (rows BETWEEN 6 PRECEDING and 1 PRECEDING), 2) as zone_boussafou
+  from power_consumptions
+  where 1=1
+    and measured_at BETWEEN '2017-01-01' and '2017-02-01T00:10:00'
+) as base
+where zone_quads is not null
 ```
 
-## 15번 - 
+## 15번 - 폐쇄할 따릉이 정류소 찾기 2
 
-풀이 방법 : 
+풀이 방법 : 그냥 어거지로 푼 듯. 왜 맞았는지는 좀 애매함
 
 ```sql
+with rental_history_bs as (
+      select * 
+      from rental_history
+      where 1=1
+        and (
+          (rent_at >= '2018-10-01' and rent_at < '2018-11-01') or 
+          (rent_at >= '2019-10-01' and rent_at < '2019-11-01') or
+          (return_at >= '2018-10-01' and return_at < '2018-11-01') or 
+          (return_at >= '2019-10-01' and return_at < '2019-11-01') 
+          )
+    ),
+    calc_rh as (
+      select st_id, dt, r_type, sum(cnt) as total_sum
+      from (
+          select rent_station_id as st_id
+              , strftime('%Y-%m', rent_at) dt
+              , 'rent' as r_type
+              , count(*) as cnt
+          from rental_history_bs
+          group by 1, 2, 3
 
+          union
+
+          select return_station_id as st_id
+              , strftime('%Y-%m', return_at) as dt
+              , 'return' as r_type
+              , count(*) as cnt
+          from rental_history_bs
+          group by 1, 2, 3
+      ) as base
+      group by 1, 2, 3
+    )
+
+
+select st_id as station_id, name, local, usage_pct
+from (
+  select st_id
+      , round(100.0 * sum(case when dt='2019-10' then total_sum else 0 end) / sum(case when dt='2018-10' then total_sum else 0 end), 2) as usage_pct
+      , name, local
+  from calc_rh
+  left join station as st on st.station_id = calc_rh.st_id
+  where 1=1
+    and st_id in (select st_id from calc_rh group by 1 having count(*) >= 2)
+  group by 1
+) res
+where usage_pct <= 50 and usage_pct > 0
 ```
 
 ## 16번 - 스테디셀러 작가 찾기
