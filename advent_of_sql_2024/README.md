@@ -6,6 +6,8 @@ Advent of SQL 2024에서 제공하는 SQL 문제 풀이 기록
 - [Advent of SQL 2024](https://solvesql.com/collections/advent-of-sql-2024/)
 - 모든 쿼리는 SQLite 기준으로 작성 되었습니다.
 
+[alt text](advent_of_sql_Image.png)
+
 ## 1번 - 크리스마스 게임 찾기
 
 풀이 방법 : 패턴 매칭 이용
@@ -489,19 +491,39 @@ from (
 order by 1
 ```
 
-## 24번 - 
+## 24번 - 세 명이 서로 친구인 관계 찾기
 
-풀이 방법 : 
+풀이 방법 : 맞기는 했는데 좀 어거지로 푼 느낌이 있다. 최적화 방법이 있을듯
 
 ```sql
-
+select 
+user_a_id, usr_a_id as user_b_id, usr_b_id as user_c_id
+from (
+  select user_a_id, usr_a_id, usr_b_id
+  from edges as ed_a
+  left join (
+    select user_a_id as usr_a_id
+        , user_b_id as usr_b_id
+    from edges
+  ) as ed_b on ed_b.usr_a_id = ed_a.user_b_id
+) as base
+left join (
+  select user_a_id as us_a_id
+      , user_b_id as us_c_id
+  from edges
+) as net on net.us_c_id = base.usr_b_id
+-- where user_a_id = 3820
+where 1=1
+  and user_a_id < usr_a_id and usr_a_id < usr_b_id and user_a_id = us_a_id
+  and (user_a_id = 3820 or usr_a_id = 3820 or usr_b_id = 3820)
+limit 1000
 ```
 
-## 25번 - 
+## 25번 - 메리 크리스마스 2024
 
 풀이 방법 : 
 - 다 풀고 나니 크리스마스에 이걸 푼 내가 레전드
 
 ```sql
-
+select 'Merry Christmas!'
 ```
