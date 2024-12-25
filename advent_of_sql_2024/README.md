@@ -471,12 +471,22 @@ left join (
 order by 2 desc
 ```
 
-## 23번 - 
+## 23번 - 유량(Flow)와 저량(Stock)
 
-풀이 방법 : 
+풀이 방법 : window 함수 잘 쓰기
 
 ```sql
-
+select ac_year as 'Acquisition year', cnt as 'New acquisitions this year (Flow)'
+     , sum(cnt) over(order by ac_year asc) as 'Total collection size (Stock)'
+from (
+  select strftime('%Y', acquisition_date) as ac_year
+      , count(*) as cnt
+  from artworks
+  where 1=1
+    and acquisition_date is not null
+  group by 1
+) as base
+order by 1
 ```
 
 ## 24번 - 
