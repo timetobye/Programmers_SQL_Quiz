@@ -448,12 +448,27 @@ from (
 ) as calc
 ```
 
-## 22번 - 
+## 22번 - 친구 수 집계하기
 
-풀이 방법 : 
+풀이 방법 : 테이블을 보니까 단방향이어서 기준을 하나로 놓고 집계 할 수 있도록 테이블을 합쳤다.
 
 ```sql
+select user_id, ifnull(num_friends, 0) as num_friends
+from users as usr
+left join (
+  select user_a_id as u_id, count(*) as num_friends
+  from (
+    select user_a_id, user_b_id
+    from edges
 
+    union
+
+    select user_b_id, user_a_id
+    from edges
+  ) as base
+  group by 1
+) as calc on calc.u_id = usr.user_id
+order by 2 desc
 ```
 
 ## 23번 - 
