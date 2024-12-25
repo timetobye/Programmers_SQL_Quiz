@@ -6,7 +6,7 @@ Advent of SQL 2024에서 제공하는 SQL 문제 풀이 기록
 - [Advent of SQL 2024](https://solvesql.com/collections/advent-of-sql-2024/)
 - 모든 쿼리는 SQLite 기준으로 작성 되었습니다.
 
-[alt text](advent_of_sql_Image.png)
+[!alt text](advent_of_sql_Image.png)
 
 ## 1번 - 크리스마스 게임 찾기
 
